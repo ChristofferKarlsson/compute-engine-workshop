@@ -1,64 +1,74 @@
 # Load balancing
-There are two types of load balancing in GCP.
-Network load balancing and HTTP(S) load balancing.
-A load balancer gives you an external IP.
-Can balance between multiple regions. (Only HTTP?) (Sends traffic to nearest)
-Setting up a load balancer is not the easiest thing to do, as it require a few things to work.
+There are two types of load balancing in the Google Cloud: Network load balancer and HTTP(S) load balancer.
+In this workshop, we will look at the HTTP(S) load balancer only.
 
-https://cloud.google.com/compute/docs/load-balancing/images/basic-http-load-balancer.svg
+A load balancer gives you an external IP, that you can hand out to your users.
+All traffic that is sent to this IP, can then be spread across multiple instances, in multiple regions (traffic goes to the nearest) and zones.
+It allows for scaling, depending on the load on the load balancer.
+This can also give you a very redundant system, and will allow for instances to fail and others to take over.
 
-In this part, we will setup a load balancer that splits the traffic between the instances in the instance groups, to share the load.
+In this part, you will setup a load balancer that splits the traffic between your current instance group, and another instance group that you will create.
+Having a load balancer sending traffic to two instance groups (in different zones) will give you a failover.
+This is a good and commonly used practice, and assures you that the site will remain up if the data centers in one the zones would go down.
 
-We will also setup another instance group in another availability zone.
-This is good practice and prevents your site from going down if the data center in one zone goes down.
-(To have it even more robust, you can set it up in multiple regions.)
+
+Setting up a load balancer is not the easiest thing to do though, as it require a few things to work.
 
 ## The parts of a load balancer
-
 To setup load balancing, you will need the following parts (and we will go through them all):
-* [Global forwarding rules](https://cloud.google.com/compute/docs/load-balancing/http/global-forwarding-rules)
-* [Target proxies](https://cloud.google.com/compute/docs/load-balancing/http/target-proxies)
-* [URL mapping](https://cloud.google.com/compute/docs/load-balancing/http/url-map) (split traffic depending on URL)
-* [Backend services](https://cloud.google.com/compute/docs/load-balancing/http/backend-service)
+* [Global forwarding rule](https://cloud.google.com/compute/docs/load-balancing/http/global-forwarding-rules)
+* [Target proxy](https://cloud.google.com/compute/docs/load-balancing/http/target-proxies)
+* [URL map](https://cloud.google.com/compute/docs/load-balancing/http/url-map)
+* [Backend service](https://cloud.google.com/compute/docs/load-balancing/http/backend-service)
     * [Health check](https://cloud.google.com/compute/docs/load-balancing/health-checks)
     * Backend(s)
         * Instance group
 
+This image shows you a nice overview of how all these things are related.
 
-### Forwarding rules
-A forwarding rule routes traffic to a target proxy of the load balancer.
+![Load balancer overview](https://cloud.google.com/compute/docs/load-balancing/images/basic-http-load-balancer.svg)
 
-A forwarding rule provides you with a single global IP address.
+
+Before setting up the load balancer, here is a quick description of all of its parts.
+
+### Global forwarding rules
+A global forwarding rule provides you with a single, global IP address that you can use for your site.
+
+The global forwarding rule will route the traffic to a target proxy, and will do the routing depending on the IP address, port, and protocol.
 
 ### Target proxies
-A target proxy terminates the HTTP(S) connection from the client and routes the traffic to the URL map.
+A target proxy receives traffic from the global forwarding rule.
+The proxy will check the request against a URL map, and route the traffic to the matching backend service.
+
+If you are using SSL, you can terminate the SSL connection here.
 
 ### URL maps
 A series of URL maps can be setup to redirect traffic to different backend services.
+For example, if you want a specific pool of servers handling everything behind `/static`, you setup a map against static that redirects your traffic to a specific backend service.
 
-For example, if you want a specific pool of servers handling everything behind `/static` you setup a specific URL map for that URL.
-
-A `default` URL map is also set up, which is where all traffic that does not match any specific rule is routed.
-(There is no need to define specific rules, everything can go to the default backend service.)
+A `default` URL map is set up, which is where all traffic that does not match any specific rule is routed.
+There is no need to define specific rules, everything can go to the default backend service.
 
 ### Backend services
-A backend service routes traffic to your backends.
+A backend service routes traffic to your backends (a backend is like an instance group).
+A backend service also has one or more health checks, that is used by the backends to determine whether the instances are healthy.
 You can have one or more backends per backend service.
 
 ### Backend
-A backend consists of an instance group, a set of rules that define the capacity of the instance group, and a health checks.
+A backend consists of an instance group, a set of rules that define the capacity of the instance group (based on CPU or requests per seond), and one or more health checks.
+The instance groups in a backend can setup an autoscaler that scales the group depending on the capacity in the backend.
 
 ### Health checks
-A check that is used to see if an instance is healthy (up and able to receive traffic).
+A check that is used to see if an instance is healthy, that is, if it is up and able to receive traffic.
 
 
 
 ## Creating a load balancer
-To see these parts in the Console, go to Network Services > Load balancing.
+If you want to examine your progress in the Console, you find them in Network Services > Load balancing.
 Here you also have a small link in the bottom to the `advanced menu` where you can inspect more parts of the load balancer.
 
 ### Add another instance group
-First, to have better availability of your site, lets add another instance group, in another zone in your region.
+First, to have better availability of your site, add another instance group, in another zone but in the same region as your first instance group.
 
 * Create a second instance group, equal to your first one but in a different zone (adjust the values below to match your first instance group)
 ```
@@ -70,6 +80,8 @@ gcloud compute instance-groups managed create webservers-managed-2 \
 ```
 
 * List your instance groups and make sure you have two, using the same template but in different zones
+
+Solution
 ```
 gcloud compute instance-groups managed list
 ```
@@ -85,16 +97,13 @@ webservers-managed-1  europe-west3-a  zone   webserver           1     1        
 
 ### Named ports
 A load balancer uses something called [named ports](https://cloud.google.com/compute/docs/instance-groups/creating-groups-of-unmanaged-instances#assign_named_ports).
-
 A named port is a key-value that maps a service name to a port (i.e. http:8080).
-
-The load balancer is setup to send traffic to the _name_ of the service, that is `http`.
-Which in practice means it will send traffic to port 8080.
+In a load balancer, the backend service sends traffic to the instance groups using the _name_ of the service, which is then mapped to an actual port in the instance group.
+This makes it possible to listen to port 80, but have your instances run on port 8080, or to have instances in different backends running on different ports.
 
 Named ports are set on instance groups, using the sub-command `set-named-ports`.
 
-* Create a named port for both your instance groups that maps `http` to port `80`.
-(Hint: Check out the `set-named-ports` option on the `instance-groups managed` command.
+* Create a named port for both your instance groups that maps `http` to port `80`
 
 Solution
 ```
@@ -107,18 +116,21 @@ gcloud compute instance-groups managed set-named-ports webservers-managed-2 \
 --zone europe-west3-b
 ```
 
-You also need to setup new autoscaling rules for your instance group, that scales depending on the load balancer.
+### Autoscaling
+You also need to setup new autoscaling rules for your instance groups.
+This time, you will set them up so they scale depending on the load on the load balancer.
 (TODO: More about the load balancing target utilization)
 
 * Setup auto-scaling for both your instance groups with the following properties
 
-| Option | Value |
-|--------|-------|
-| Min instances | 1 |
-| Max instances | 3 |
-| Target load balancing utilization | 0.6 |
-| zone | Your zone |
+| Option | Value | Description |
+|--------|-------|-------------|
+| Min instances | 1 ||
+| Max instances | 3 ||
+| Target load balancing utilization | 0.6 | Threshold for autoscaling |
+| zone | Your zone | |
 
+Solution
 ```
 gcloud compute instance-groups managed set-autoscaling webservers-managed-1 \
 --min-num-replicas 1 \
@@ -135,16 +147,18 @@ gcloud compute instance-groups managed set-autoscaling webservers-managed-2 \
 
 
 ### Backend services and backends
-As stated earlier, a backend service consists of a health check and one or more backends.
+As stated earlier, a backend service consists of health checks and one or more backends.
 
-For our backend service to know if the instances in the backends are healthy and ready to receive traffic, you use [health checks](https://cloud.google.com/compute/docs/load-balancing/health-checks).
-You use different health checks depending on your instances.
+#### Health checks
+For our backend service to know if the instances in the backends are healthy and ready to receive traffic, they use [health checks](https://cloud.google.com/compute/docs/load-balancing/health-checks).
+You can use different health checks depending on your instances.
 
 The health check that you are going to use is the HTTP health check.
 The HTTP health check determines the health of the instance by the returned status code, where a standard `200` is considered healthy.
-The HTTP health check can be setup on a specific path on the server, such as `/status`.
+If wanted, the HTTP health check can be setup on a specific path on the server, such as `/status`.
+This allows you to setup a specific health page that check integrations and whatnot that might be of interest.
 
-(TODO: Write more about how health checks affect instances and traffic.)
+(TODO: Write more about how health checks affect instances and traffic?)
 
 The health check command is located under `gcloud compute health-checks`
 
@@ -155,11 +169,12 @@ Solution
 gcloud compute health-checks create http http-basic-check
 ```
 
+
+#### Backend services
 The backend services are managed with the `gcloud compute backend-services` command.
 
-* Create a global backend service, on `http` protocol that uses your `http-basic-check` health check
-
-(TODO: Global vs. not global?)
+* Create a global backend service, using `http` protocol that uses your `http-basic-check` health check
+(Note: If no `port-name` is assigned, it will automatically be set to `http`, which is what you named your port).
 
 Solution
 ```
@@ -168,21 +183,25 @@ gcloud compute backend-services create webservers-backend-service \
 --health-checks http-basic-check \
 --global
 ```
-(TODO: Can be `global`)
+(TODO: Global vs. not global?)
 
+
+#### Backends
 With the backend service in place, you can now add [backends](https://cloud.google.com/compute/docs/load-balancing/http/backend-service) to it.
 
 A backend contains an instance group, a balancing mode and a capacity setting.
 The balancing mode is either CPU utilization or the request rate (number of requests per second),
 and is used by the backend service together with the capacity setting, to determine whether or not there is capacity for more requests in the backend.
 
-* Create a global backend for your instance groups with the following properties
+There is a sub-command under `gcloud compute backend-services` that is used to add backends.
+
+* Find the command and create two global backends for your instance groups with the following properties
 
 (TODO: Why global?)
 
 | Option | Value |
 |--------|-------|
-| Instance group | webservers-managed-[1,2] |
+| Instance group | webservers-managed-\[1,2\] |
 | Instance group zone | Your zones for respective instance group |
 | Balancing mode | RATE |
 | Max rate per instance | 100 |
@@ -204,9 +223,10 @@ gcloud compute backend-services add-backend webservers-backend-service \
 --global
 ```
 
+This will add two backends to your backend service, that both has a capacity of 100 requests per second per instance.
 
 
-### The rest/Frontend
+### URL map
 You are not going to use any special URL mappings in this workshop, so lets just create a default one, that maps all traffic to your only backend service.
 
 The URL maps are configured using the `gcloud compute url-maps` command.
@@ -219,13 +239,13 @@ gcloud compute url-maps create webservers-mapping \
 --default-service webservers-backend-service
 ```
 
+
+### Target proxy
 Then you will need a target HTTP proxy, that receives all traffic from a global forwarding rule and redirects it to your URL mapping.
 
 The target proxies are configured using the `gcloud compute target-http-proxies` command.
 
 * Create a target HTTP proxy, that redirects traffic to your URL map
-
-(TODO: Write why using this: SSL termination f.e.)
 
 Solution
 ```
@@ -233,6 +253,8 @@ gcloud compute target-http-proxies create webservers-target-proxy \
 --url-map webservers-mapping
 ```
 
+
+### Global forwarding rule
 Finally, you need a global forwarding rule.
 A forwarding rule is a single, global IP address that you can use to receive traffic to your load balancer.
 The forwarding rule receives traffic on its IP address and routes it to your target proxy.
@@ -247,10 +269,10 @@ gcloud compute forwarding-rules create webservers-forwarding-rules \
 --ports 80
 ```
 
-* List your forwarding rules to get the global IP address of your load balancer.
+* List your forwarding rules to get the global IP address of your load balancer
 
 It may take some time for everything to be setup.
-So, now is the time to celebrate a bit with a cup of coffee or tea, or water, or something else :)
+So, now is the time to celebrate with a cup of coffee or tea, or water, or something else :)
 
 When it is done setting up, reload the site a couple of times to be sure that there are multiple servers that are handling your requests.
 
