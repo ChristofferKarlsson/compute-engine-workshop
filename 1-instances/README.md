@@ -165,7 +165,7 @@ Startup scripts are added to an instance using [metadata](https://cloud.google.c
 | tags   | http-server |
 | machine-type | f1-micro |
 | boot-disk-type | pd-ssd |
-| metadata | startup-script | A script that does everything we did before: update tje system, install nginx, create a page that shows your instance's info, change nginx settings and finally reload nginx config. |
+| metadata | startup-script | A script that does everything we did before: update the system, install nginx, create a page that shows your instance's info, change nginx settings and finally reload nginx config. |
 
 ```
 #! /bin/bash
