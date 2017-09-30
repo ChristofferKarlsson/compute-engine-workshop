@@ -35,7 +35,10 @@ But please notice that the names of the resources might be different from what y
 2. [Networks](2-networks)
 3. [Instance groups](3-instance-groups)
 4. [Load balancing](4-load-balancing)
-5. [Final touches](5-final-touches)
+
+Extra tasks
+
+5. [Secure the SSH access](5-secure-ssh-access)
 
 ### Extra
 If you are done early, here are some extra tasks you could do
