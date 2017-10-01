@@ -1,4 +1,4 @@
-# Secure the SSH access
+# Part 5 - Secure the SSH access
 As it is setup now, the SSH port on the webservers are open to the world.
 This is generally not a good idea.
 
@@ -25,6 +25,26 @@ To update and change the configuration on the webservers, you can not just chang
 Instead, you must create a new template and update your instance group to use this new template.
 
 * Create a new template for the webservers, with the same properties as before, but without the `ssh` tag
+
+|Option | Value |
+|-------|-------|
+| Name | webserver-template-1 |
+| Machine type | f1-micro |
+| Image | Your custom disk|
+| Tags | http |
+| Subnet | webservers |
+| Region | Your subnet region |
+| Metadata | startup-script (see below) |
+
+```
+#! /bin/bash
+apt-get update
+apt-get install nginx -y
+echo 'Hostname: <!--# echo var=\"hostname\" default=\"unknown_host\" --><br/>IP address: <!--# echo var=\"host\" default=\"unknown_host\" -->' > /var/www/html/index.html
+sed -i '/listen \[::\]:80 default_server/a ssi on;' /etc/nginx/sites-available/default
+service nginx reload
+```
+When executing the command, surround the startup-script with a starting and ending `"`.
 
 Solution
 ```
@@ -79,3 +99,7 @@ ssh -o ProxyCommand="ssh -W %h:%p <bastion-external-ip>" <webserver-internal-ip>
 There is a simpler command for this (where you can just apply the `-J` flag), but that requires a newer version of `OpenSSH`.
 If you want to know more about this, [you can read about it here](https://en.wikibooks.org/wiki/OpenSSH/Cookbook/Proxies_and_Jump_Hosts#Passing_Through_a_Gateway_Using_stdio_Forwarding_.28Netcat_Mode.29).
 
+
+Want to do another extra part and secure your instances even more? Go to [Part 6 - Secure the HTTP access](../6-secure-http-access).
+
+If not, make sure you remember to [clean up after you are done](../#clean-up).

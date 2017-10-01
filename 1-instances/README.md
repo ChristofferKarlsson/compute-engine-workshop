@@ -109,10 +109,10 @@ gcloud compute instances describe instance-2
 
 Solution
 ```
-gcloud compute ssh <instance-name>
+gcloud compute ssh instance-2
 ```
 
-* Install nginx as before
+Install nginx as before
 ```
 sudo apt-get update
 sudo apt-get install nginx -y
@@ -146,6 +146,8 @@ Then reload nginx
 service nginx reload
 ```
 
+* Verify the result (you might need to wait a few seconds and do a hard refresh)
+
 ## Startup scripts
 There are not an awful amount of manual steps that you need to replicate to have one more machine setup with nginx that show your IP and hostname.
 But this is just a small example, and in the real world, there would probably be a lot more!
@@ -158,14 +160,16 @@ Startup scripts are added to an instance using [metadata](https://cloud.google.c
 
 * Create an instance with a startup script, with the following properties
 
-| Option | Value | Description |
-| ------ | ----- | ----------- |
+| Option | Value |
+| ------ | ----- |
 | name   | instance-3 |
 | zone   | \<any-zone\> |
 | tags   | http-server |
 | machine-type | f1-micro |
 | boot-disk-type | pd-ssd |
-| metadata | startup-script | A script that does everything we did before: update the system, install nginx, create a page that shows your instance's info, change nginx settings and finally reload nginx config. |
+| metadata | startup-script (see the actual startup script below) |
+
+The startup script. Does everything we did before: update the system, install nginx, create a page that shows your instance's info, change nginx settings and finally reload nginx config.
 
 ```
 #! /bin/bash
@@ -216,10 +220,10 @@ We will use both nginx and Java later, and in this part we will create an image 
 gcloud compute images list
 ```
 
-* Create an instance that is built on the Ubuntu 16.04 LTS image (hint: use the flags `--image` and `--image-project`) and has the following properties
+* Create an instance that is built on the Ubuntu 16.04 LTS image (hint: use the flags `--image` and `--image-project`) and has the following other properties
 
- Option | Value | Description |
-| ------ | ----- | ----------- |
+ Option | Value |
+| ------ | ----- |
 | name   | webserver-base |
 | zone   | \<any-zone\> |
 | machine-type | f1-micro |
@@ -233,7 +237,7 @@ gcloud compute instances create webserver-base \
 --image-project ubuntu-os-cloud
 ```
 
-SSH to the image and update the system
+SSH to the instance and update the system
 ```
 sudo apt-get update && sudo apt-get -y upgrade
 ```

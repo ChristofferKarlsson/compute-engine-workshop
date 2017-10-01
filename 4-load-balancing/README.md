@@ -1,4 +1,4 @@
-# Load balancing
+# Part 4 - Load balancing
 There are two types of load balancing in the Google Cloud: Network load balancer and HTTP(S) load balancer.
 In this workshop, we will look at the HTTP(S) load balancer only.
 
@@ -264,6 +264,11 @@ gcloud compute forwarding-rules create webservers-forwarding-rules \
 
 * List your forwarding rules to get the global IP address of your load balancer
 
+Solution
+```
+gcloud compute forwarding-rules list
+```
+
 It may take some time for everything to be setup.
 So, now is the time to celebrate with a cup of coffee or tea, or water, or something else :)
 
@@ -272,4 +277,7 @@ When it is done setting up, reload the site a couple of times to be sure that th
 ## Stress testing/Testing the autoscaler
 
 
-When you are done, you can go to [Part 5 - Final touches](../5-final-touches).
+When you are done, you are done with the mandatory parts! Well done! :)
+
+There are some extra parts that I encourage you to do, starting with [Part 6 - Securing the SSH access](../6-secure-ssh-access).
+Or if you have something else do to, remember to [clean up after you are done](../#clean-up).

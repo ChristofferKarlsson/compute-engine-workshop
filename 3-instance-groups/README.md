@@ -50,7 +50,7 @@ echo 'Hostname: <!--# echo var=\"hostname\" default=\"unknown_host\" --><br/>IP 
 sed -i '/listen \[::\]:80 default_server/a ssi on;' /etc/nginx/sites-available/default
 service nginx reload
 ```
-As with the instances, when executing the command surround the startup-script with a starting and ending `"`.
+As with the instances, when executing the command, surround the startup-script with a starting and ending `"`.
 
 Solution
 ```
@@ -179,7 +179,7 @@ To put it under load, you will install and run a CPU stressing program on the in
 * SSH to the instance in your instance group
 
 
-Install the Linux stress testing program [stress](https://linux.die.net/man/1/stress):
+Install the Linux stress testing program [stress](https://linux.die.net/man/1/stress)
 ```
 sudo apt-get install stress
 ```
