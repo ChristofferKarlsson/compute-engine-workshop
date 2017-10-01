@@ -125,3 +125,6 @@ gcloud beta compute instance-groups managed rolling-action start-update webserve
 * Verify that your new instances does not have any external IP
 
 * Verify that the instances still work through your load balancer IP (this might take some minute)
+
+
+You can now go back to the main page and do some extra tasks if you want, or finish the workshop by [cleaning up after you](../7-clean-up).

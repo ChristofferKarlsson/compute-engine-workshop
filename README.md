@@ -39,7 +39,7 @@ But please notice that the names of the resources might be different from what y
 Extra tasks
 
 5. [Secure the SSH access (using a bastion host)](5-secure-ssh-access)
-5. [Secure the HTTP access (only allow the load balancer access)](6-secure-http-access)
+6. [Secure the HTTP access (only allow the load balancer access)](6-secure-http-access)
 
 ### Extra
 If you are done early, there are some cool stuff that you could look at.
@@ -54,3 +54,12 @@ Here are some suggestions.
 * [Create an extra disk and attach to an instance](https://cloud.google.com/compute/docs/disks/add-persistent-disk)
 * Change your backends to have instances in multiple regions
 * Setup a SQL server and connect the app to it
+
+## Clean up
+When you feel done with the workshop, you should clean up everything, so there is nothing idling and costing you money.
+The easiest way to remove all resources, is to shut down the entire project, as this will stop all resources.
+
+To shut down the entire project, run the following command (it can be run in the Cloud Shell in the current project)
+```
+gcloud projects delete <project-id>
+```
