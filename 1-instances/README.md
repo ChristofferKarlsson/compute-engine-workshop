@@ -164,7 +164,7 @@ Active: active (running) ...
 <p>
 <details>
 <summary><strong>
-Open the <code>http://\<external-ip\>/</code> in your browser to verify that you can connect to it
+Open the <code>http://&lt;external-ip&gt;/</code> in your browser to verify that you can connect to it
 </strong></summary>
 
 </details>
