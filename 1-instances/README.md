@@ -69,14 +69,23 @@ To find the available flags (and the one you are interested in), you can append 
 All this command documentation is also available in the [online documentation](https://cloud.google.com/sdk/gcloud/reference/).
 
 <details>
-<summary>* **Find the command to list instances and make sure you see the previously created instance there (click for solution)**</summary>
+<summary><strong>Find the command to list instances and make sure you see the previously created instance there</strong></summary>
 
 ```
 gcloud compute instances list
 ```
 </details>
 
-* Now create an instance similar to the previous one, using the the following properties.
+<details>
+<summary><strong>Now create an instance similar to the previous one, using the the following properties.</strong></summary>
+```
+gcloud compute instances create instance-2 \
+--zone europe-west3-a \
+--tags http-server \
+--machine-type f1-micro \
+--boot-disk-type pd-ssd
+```
+</details>
 (Tip: Use the `gcloud compute instances create --help` to find the flags you need.)
 
 | Option | Value | Description |
@@ -86,15 +95,6 @@ gcloud compute instances list
 | tags   | http-server | This associates the server with the firewall rule `http-server`, more about this in the next part. |
 | machine-type | f1-micro | To list the machine types, use `gcloud compute machine-types list`. |
 | boot-disk-type | pd-ssd | Using an SSD disk. See disk types using `gcloud compute disk-types list`. |
-
-Solution
-```
-gcloud compute instances create instance-2 \
---zone europe-west3-a \
---tags http-server \
---machine-type f1-micro \
---boot-disk-type pd-ssd
-```
 
 When you have created the machine:
 * List the instances and make sure your new instance is there
