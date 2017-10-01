@@ -77,7 +77,8 @@ gcloud compute instances list
 </details>
 
 <details>
-<summary><strong>Now create an instance similar to the previous one, using the the following properties.</strong></summary>
+<summary><strong>Now create an instance similar to the previous one, using the the following properties. (Tip: Use the `gcloud compute instances create --help` to find the flags you need.)</strong></summary>
+
 ```
 gcloud compute instances create instance-2 \
 --zone europe-west3-a \
@@ -86,7 +87,7 @@ gcloud compute instances create instance-2 \
 --boot-disk-type pd-ssd
 ```
 </details>
-(Tip: Use the `gcloud compute instances create --help` to find the flags you need.)
+
 
 | Option | Value | Description |
 | ------ | ----- | ----------- |
