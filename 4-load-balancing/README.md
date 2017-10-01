@@ -70,7 +70,12 @@ Here you also have a small link in the bottom to the `advanced menu` where you c
 ### Add another instance group
 First, to have better availability of your site, add another instance group, in another zone but in the same region as your first instance group.
 
-* Create a second instance group, equal to your first one but in a different zone (adjust the values below to match your first instance group)
+<p>
+<details>
+<summary><strong>
+Create a second instance group, equal to your first one but in a different zone (adjust the values below to match your first instance group)
+</strong></summary>
+
 ```
 gcloud compute instance-groups managed create webservers-managed-2 \
 --base-instance-name webserver \
@@ -78,13 +83,20 @@ gcloud compute instance-groups managed create webservers-managed-2 \
 --template webserver-template-1 \
 --zone europe-west3-b
 ```
+</details>
+</p>
 
-* List your instance groups and make sure you have two, using the same template but in different zones
+<p>
+<details>
+<summary><strong>
+List your instance groups and make sure you have two, using the same template but in different zones
+</strong></summary>
 
-Solution
 ```
 gcloud compute instance-groups managed list
 ```
+</details>
+</p>
 
 Your output should be very similar to the following
 ```
@@ -103,9 +115,12 @@ This makes it possible to listen to port 80, but have your instances run on port
 
 Named ports are set on instance groups, using the sub-command `set-named-ports`.
 
-* Create a named port for both your instance groups that maps `http` to port `80`
+<p>
+<details>
+<summary><strong>
+Create a named port for both your instance groups that maps <code>http</code> to port <code>80</code>
+</strong></summary>
 
-Solution
 ```
 gcloud compute instance-groups managed set-named-ports webservers-managed-1 \
 --named-ports http:80 \
@@ -115,21 +130,20 @@ gcloud compute instance-groups managed set-named-ports webservers-managed-2 \
 --named-ports http:80 \
 --zone europe-west3-b
 ```
+</details>
+</p>
+
 
 ### Autoscaling
 You also need to setup new autoscaling rules for your instance groups.
 This time, you will set them up so they scale depending on the load on the load balancer.
 
-* Setup auto-scaling for both your instance groups with the following properties
+<p>
+<details>
+<summary><strong>
+Setup auto-scaling for both your instance groups with the following properties
+</strong></summary>
 
-| Option | Value | Description |
-|--------|-------|-------------|
-| Min instances | 1 ||
-| Max instances | 3 ||
-| Target load balancing utilization | 0.6 | Threshold for autoscaling |
-| zone | Your zone | |
-
-Solution
 ```
 gcloud compute instance-groups managed set-autoscaling webservers-managed-1 \
 --min-num-replicas 1 \
@@ -143,6 +157,16 @@ gcloud compute instance-groups managed set-autoscaling webservers-managed-2 \
 --target-load-balancing-utilization 0.6 \
 --zone europe-west3-b
 ```
+</details>
+</p>
+
+
+| Option | Value | Description |
+|--------|-------|-------------|
+| Min instances | 1 ||
+| Max instances | 3 ||
+| Target load balancing utilization | 0.6 | Threshold for autoscaling |
+| zone | Your zone | |
 
 
 ### Backend services and backends
@@ -159,27 +183,38 @@ This allows you to setup a specific health page that check integrations and what
 
 The health check command is located under `gcloud compute health-checks`
 
-* Create an HTTP health check with the name `http-basic-check`
+<p>
+<details>
+<summary><strong>
+Create an HTTP health check with the name <code>http-basic-check</code>
+</strong></summary>
 
-Solution
 ```
 gcloud compute health-checks create http http-basic-check
 ```
+</details>
+</p>
 
 
 #### Backend services
 The backend services are managed with the `gcloud compute backend-services` command.
 
-* Create a global backend service, using `http` protocol that uses your `http-basic-check` health check
-(Note: If no `port-name` is assigned, it will automatically be set to `http`, which is what you named your port).
+<p>
+<details>
+<summary><strong>
+Create a global backend service, using <code>http</code> protocol that uses your <code>http-basic-check</code> health check
+</strong></summary>
 
-Solution
+(Note: If no <code>port-name</code> is assigned, it will automatically be set to <code>http</code>, which is what you named your port).
 ```
 gcloud compute backend-services create webservers-backend-service \
 --protocol http \
 --health-checks http-basic-check \
 --global
 ```
+</details>
+</p>
+
 
 #### Backends
 With the backend service in place, you can now add [backends](https://cloud.google.com/compute/docs/load-balancing/http/backend-service) to it.
@@ -190,16 +225,12 @@ and is used by the backend service together with the capacity setting, to determ
 
 There is a sub-command under `gcloud compute backend-services` that is used to add backends.
 
-* Find the command and create two global backends for your instance groups with the following properties
+<p>
+<details>
+<summary><strong>
+Find the command and create two global backends for your instance groups with the following properties
+</strong></summary>
 
-| Option | Value |
-|--------|-------|
-| Instance group | webservers-managed-\[1,2\] |
-| Instance group zone | Your zones for respective instance group |
-| Balancing mode | RATE |
-| Max rate per instance | 100 |
-
-Solution
 ```
 gcloud compute backend-services add-backend webservers-backend-service \
 --instance-group webservers-managed-1 \
@@ -215,6 +246,16 @@ gcloud compute backend-services add-backend webservers-backend-service \
 --max-rate-per-instance 100 \
 --global
 ```
+</details>
+</p>
+
+| Option | Value |
+|--------|-------|
+| Instance group | webservers-managed-\[1,2\] |
+| Instance group zone | Your zones for respective instance group |
+| Balancing mode | RATE |
+| Max rate per instance | 100 |
+
 
 This will add two backends to your backend service, that both has a capacity of 100 requests per second per instance.
 
@@ -224,13 +265,18 @@ You are not going to use any special URL mappings in this workshop, so lets just
 
 The URL maps are configured using the `gcloud compute url-maps` command.
 
-* Create a default URL map that sends everything to your backend service
+<p>
+<details>
+<summary><strong>
+Create a default URL map that sends everything to your backend service
+</strong></summary>
 
-Solution
 ```
 gcloud compute url-maps create webservers-mapping \
 --default-service webservers-backend-service
 ```
+</details>
+</p>
 
 
 ### Target proxy
@@ -238,13 +284,18 @@ Then you will need a target HTTP proxy, that receives all traffic from a global 
 
 The target proxies are configured using the `gcloud compute target-http-proxies` command.
 
-* Create a target HTTP proxy, that redirects traffic to your URL map
+<p>
+<details>
+<summary><strong>
+Create a target HTTP proxy, that redirects traffic to your URL map
+</strong></summary>
 
-Solution
 ```
 gcloud compute target-http-proxies create webservers-target-proxy \
 --url-map webservers-mapping
 ```
+</details>
+</p>
 
 
 ### Global forwarding rule
@@ -254,20 +305,32 @@ The forwarding rule receives traffic on its IP address and routes it to your tar
 
 The forwarding rules are configured using the `gcloud compute forwarding-rules` command.
 
-* Create a global forwarding rule that receives traffic on port 80 and sends it to your target proxy
+<p>
+<details>
+<summary><strong>
+Create a global forwarding rule that receives traffic on port 80 and sends it to your target proxy
+</strong></summary>
+
 ```
 gcloud compute forwarding-rules create webservers-forwarding-rules \
 --global \
 --target-http-proxy webservers-target-proxy \
 --ports 80
 ```
+</details>
+</p>
 
-* List your forwarding rules to get the global IP address of your load balancer
+<p>
+<details>
+<summary><strong>
+List your forwarding rules to get the global IP address of your load balancer
+</strong></summary>
 
-Solution
 ```
 gcloud compute forwarding-rules list
 ```
+</details>
+</p>
 
 It may take some time for everything to be setup.
 So, now is the time to celebrate with a cup of coffee or tea, or water, or something else :)
