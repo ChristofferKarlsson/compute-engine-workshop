@@ -68,6 +68,7 @@ To find the available flags (and the one you are interested in), you can append 
 
 All this command documentation is also available in the [online documentation](https://cloud.google.com/sdk/gcloud/reference/).
 
+<p>
 <details>
 <summary><strong>Find the command to list instances and make sure you see the previously created instance there</strong></summary>
 
@@ -75,7 +76,8 @@ All this command documentation is also available in the [online documentation](h
 gcloud compute instances list
 ```
 </details>
-
+</p>
+<p>
 <details>
 <summary><strong>Now create an instance similar to the previous one, using the the following properties. (Tip: Use the `gcloud compute instances create --help` to find the flags you need.)</strong></summary>
 
@@ -87,7 +89,7 @@ gcloud compute instances create instance-2 \
 --boot-disk-type pd-ssd
 ```
 </details>
-
+</p>
 
 | Option | Value | Description |
 | ------ | ----- | ----------- |
