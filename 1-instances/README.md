@@ -68,12 +68,13 @@ To find the available flags (and the one you are interested in), you can append 
 
 All this command documentation is also available in the [online documentation](https://cloud.google.com/sdk/gcloud/reference/).
 
-* Find the command to list instances and make sure you see the previously created instance there
+<details>
+<summary>* **Find the command to list instances and make sure you see the previously created instance there (click for solution)**</summary>
 
-Solution
 ```
 gcloud compute instances list
 ```
+</details>
 
 * Now create an instance similar to the previous one, using the the following properties.
 (Tip: Use the `gcloud compute instances create --help` to find the flags you need.)
