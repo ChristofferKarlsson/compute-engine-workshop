@@ -68,15 +68,35 @@ To find the available flags (and the one you are interested in), you can append 
 
 All this command documentation is also available in the [online documentation](https://cloud.google.com/sdk/gcloud/reference/).
 
-* Find the command to list instances and make sure you see the previously created instance there
+<p>
+<details>
+<summary><strong>
+Find the command to list instances and make sure you see the previously created instance there
+</strong></summary>
 
-Solution
 ```
 gcloud compute instances list
 ```
+</details>
+</p>
 
-* Now create an instance similar to the previous one, using the the following properties.
-(Tip: Use the `gcloud compute instances create --help` to find the flags you need.)
+<p>
+<details>
+<summary><strong>
+Now create an instance similar to the previous one, using the the following properties.
+(Tip: Use the <code>gcloud compute instances create --help</code> to find the flags you need.)
+</strong></summary>
+
+```
+gcloud compute instances create instance-2 \
+--zone europe-west3-a \
+--tags http-server \
+--machine-type f1-micro \
+--boot-disk-type pd-ssd
+```
+</details>
+</p>
+
 
 | Option | Value | Description |
 | ------ | ----- | ----------- |
@@ -86,31 +106,44 @@ gcloud compute instances list
 | machine-type | f1-micro | To list the machine types, use `gcloud compute machine-types list`. |
 | boot-disk-type | pd-ssd | Using an SSD disk. See disk types using `gcloud compute disk-types list`. |
 
-Solution
-```
-gcloud compute instances create instance-2 \
---zone europe-west3-a \
---tags http-server \
---machine-type f1-micro \
---boot-disk-type pd-ssd
-```
-
 When you have created the machine:
-* List the instances and make sure your new instance is there
-* Use the `describe` sub-command to examine the properties of the new machine
+<p>
+<details>
+<summary><strong>
+List the instances and make sure your new instance is there
+</strong></summary>
 
-Solution
+```
+gcloud compute instances list
+```
+</details>
+</p>
+
+<p>
+<details>
+<summary><strong>
+Use the <code>describe</code> sub-command to examine the properties of the new machine
+</strong></summary>
+
 ```
 gcloud compute instances describe instance-2
 ```
+</details>
+</p>
+
 
 ### Install nginx
-* SSH to the instance, this time using the Cloud SDK SSH wrapper (Tip: `gcloud compute ssh`)
+<p>
+<details>
+<summary><strong>
+SSH to the instance, this time using the Cloud SDK SSH wrapper (Tip: <code>gcloud compute ssh</code>)
+</strong></summary>
 
-Solution
 ```
 gcloud compute ssh instance-2
 ```
+</details>
+</p>
 
 Install nginx as before
 ```
@@ -128,8 +161,14 @@ Active: active (running) ...
 ...
 ```
 
-* Open the `http://<external-ip/` in your browser to verify that you can connect to it
+<p>
+<details>
+<summary><strong>
+Open the <code>http://<external-ip/</code> in your browser to verify that you can connect to it
+</strong></summary>
 
+</details>
+</p>
 
 Now modify the nginx server so that we can see the hostname of the current machine
 ```
@@ -146,7 +185,14 @@ Then reload nginx
 service nginx reload
 ```
 
-* Verify the result (you might need to wait a few seconds and do a hard refresh)
+<p>
+<details>
+<summary><strong>
+Verify the result (you might need to wait a few seconds and do a hard refresh)
+</strong></summary>
+
+</details>
+</p>
 
 ## Startup scripts
 There are not an awful amount of manual steps that you need to replicate to have one more machine setup with nginx that show your IP and hostname.
@@ -158,7 +204,28 @@ A startup script is run as root when a machine is booted, and can be use to auto
 
 Startup scripts are added to an instance using [metadata](https://cloud.google.com/compute/docs/storing-retrieving-metadata).
 
-* Create an instance with a startup script, with the following properties
+<p>
+<details>
+<summary><strong>
+Create an instance with a startup script, with the following properties
+</strong></summary>
+
+```
+gcloud compute instances create instance-3 \
+--zone europe-west3-a \
+--tags http-server \
+--machine-type f1-micro \
+--boot-disk-type pd-ssd \
+--metadata startup-script="#! /bin/bash
+apt-get update
+apt-get install nginx -y
+echo 'Hostname: <!--# echo var=\"hostname\" default=\"unknown_host\" --><br/>IP address: <!--# echo var=\"host\" default=\"unknown_host\" -->' > /var/www/html/index.html
+sed -i '/listen \[::\]:80 default_server/a ssi on;' /etc/nginx/sites-available/default
+service nginx reload
+"
+```
+</details>
+</p>
 
 | Option | Value |
 | ------ | ----- |
@@ -181,24 +248,14 @@ service nginx reload
 ```
 When executing the command surround the startup-script with a starting and ending `"`.
 
-Solution
-```
-gcloud compute instances create instance-3 \
---zone europe-west3-a \
---tags http-server \
---machine-type f1-micro \
---boot-disk-type pd-ssd \
---metadata startup-script="#! /bin/bash
-apt-get update
-apt-get install nginx -y
-echo 'Hostname: <!--# echo var=\"hostname\" default=\"unknown_host\" --><br/>IP address: <!--# echo var=\"host\" default=\"unknown_host\" -->' > /var/www/html/index.html
-sed -i '/listen \[::\]:80 default_server/a ssi on;' /etc/nginx/sites-available/default
-service nginx reload
-"
-```
+<p>
+<details>
+<summary><strong>
+Wait a few seconds after the machine is created, then open your browser and verify that it runs the same page as before, showing your IP and hostname.
+</strong></summary>
 
-* Wait a few seconds after the machine is created, then open your browser and verify that it runs the same page as before, showing your IP and hostname.
-
+</details>
+</p>
 
 ## Images
 In a scenario where you are using some autoscaling mechanism for creating instances, you want the instances to be created fast.
@@ -215,20 +272,26 @@ This allows you to create a custom image that has the OS updated (well, updated 
 
 We will use both nginx and Java later, and in this part we will create an image with the software installed.
 
-* Find the command and list all available images (hint: it is under `gcloud compute`)
+
+<p>
+<details>
+<summary><strong>
+Find the command and list all available images (hint: it is under <code>gcloud compute</code>)
+</strong></summary>
+
 ```
 gcloud compute images list
 ```
+</details>
+</p>
 
-* Create an instance that is built on the Ubuntu 16.04 LTS image (hint: use the flags `--image` and `--image-project`) and has the following other properties
+<p>
+<details>
+<summary><strong>
+Create an instance that is built on the Ubuntu 16.04 LTS image (hint: use the flags <code>--image</code> and <code>--image-project</code>) and has the following other properties
 
- Option | Value |
-| ------ | ----- |
-| name   | webserver-base |
-| zone   | \<any-zone\> |
-| machine-type | f1-micro |
+</strong></summary>
 
-Solution
 ```
 gcloud compute instances create webserver-base \
 --zone europe-west3-a \
@@ -236,6 +299,15 @@ gcloud compute instances create webserver-base \
 --image ubuntu-1604-xenial-v20170919 \
 --image-project ubuntu-os-cloud
 ```
+</details>
+</p>
+
+
+| Option | Value |
+| ------ | ----- |
+| name   | webserver-base |
+| zone   | \<any-zone\> |
+| machine-type | f1-micro |
 
 SSH to the instance and update the system
 ```
@@ -262,13 +334,18 @@ In your case, it will be the *boot* disk that is attached to the instance (each 
 
 Before creating an image from the disk, you need to stop the instance.
 
-* Stop your instance
+<p>
+<details>
+<summary><strong>
+Stop your instance
+</strong></summary>
 
-Solution
 ```
 gcloud compute instances stop webserver-base \
 --zone europe-west3-a
 ```
+</details>
+</p>
 
 The instance should now be **TERMINATED** ([more about instance states](https://cloud.google.com/compute/docs/instances/checking-instance-status))
 
@@ -276,45 +353,81 @@ You can now delete the instance, as you will only need its disk.
 Normally, the boot disk is automatically deleted when deleting an instance.
 To prevent this, you can either provide a flag when creating an instance, or when you delete it.
 
-* Delete the instance but keep the *boot* disk (hint: there is a flag for it)
+<p>
+<details>
+<summary><strong>
+Delete the instance but keep the <em>boot</em> disk (hint: there is a flag for it)
+</strong></summary>
 
-Solution
 ```
 gcloud compute instances delete webserver-base \
 --zone europe-west3-a \
 --keep-disks boot
 ```
+</details>
+</p>
 
+<p>
+<details>
+<summary><strong>
+Examine the <code>gcloud compute images</code> command, especially the <code>create</code> sub-command
+</strong></summary>
 
-* Examine the `gcloud compute images` command, especially the `create` sub-command.
+```
+gcloud compute images create --help
+```
+</details>
+</p>
 
-* Create an image named `ubuntu-1604-webserver-base`, using your disk (hint: you need two flags)
+<p>
+<details>
+<summary><strong>
+Create an image named <code>ubuntu-1604-webserver-base</code>, using your disk (hint: you need two flags)
+</strong></summary>
 
-Solution
 ```
 gcloud compute images create ubuntu-1604-webserver-base \
 --source-disk webserver-base \
 --source-disk-zone europe-west3-a
 ```
+</details>
+</p>
 
-* List the disks and find your old boot disk
-* Delete the disk
+<p>
+<details>
+<summary><strong>
+List the disks and find your old boot disk
+</strong></summary>
 
-Solution
 ```
 gcloud compute disks list
 ```
+</details>
+</p>
 
-Solution
+
+<p>
+<details>
+<summary><strong>
+Delete the disk
+</strong></summary>
+
 ```
 gcloud compute disks delete webserver-base \
 --zone europe-west3-a
 ```
+</details>
+</p>
 
 ### Create a new instance using the image
 It is now time to try out your newly created image!
 
-* Create an instance using the new image, also apply the `http-server` tag to it
+<p>
+<details>
+<summary><strong>
+Create an instance using the new image, also apply the <code>http-server</code> tag to it
+</strong></summary>
+
 ```
 gcloud compute instances create instance-4 \
 --zone europe-west3-a \
@@ -322,16 +435,32 @@ gcloud compute instances create instance-4 \
 --tags http-server \
 --image ubuntu-1604-webserver-base
 ```
+</details>
+</p>
 
-* Verify that your new instance is created and that it has an nginx server up and running.
+<p>
+<details>
+<summary><strong>
+Verify that your new instance is created and that it has an nginx server up and running.
+</strong></summary>
+
+Visit the IP and verify that it is running
+</details>
+</p>
 
 ## Clean up
 You will not need the instances created here in later parts of the workshop, so go ahead and delete them.
 
-* Delete all instances that you have created
+<p>
+<details>
+<summary><strong>
+Delete all instances that you have created
+</strong></summary>
+
 ```
 gcloud compute instances delete instance-1 instance-2 instance-3 instance-4
 ```
-
+</details>
+</p>
 
 When you are done, you can go to [Part 2 - Networks](../2-networks).
