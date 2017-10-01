@@ -205,7 +205,6 @@ The backend services are managed with the `gcloud compute backend-services` comm
 Create a global backend service, using <code>http</code> protocol that uses your <code>http-basic-check</code> health check
 </strong></summary>
 
-(Note: If no <code>port-name</code> is assigned, it will automatically be set to <code>http</code>, which is what you named your port).
 ```
 gcloud compute backend-services create webservers-backend-service \
 --protocol http \
@@ -213,6 +212,8 @@ gcloud compute backend-services create webservers-backend-service \
 --global
 ```
 </details>
+
+(Note: If no <code>port-name</code> is assigned, it will automatically be set to <code>http</code>, which is what you named your port).
 </p>
 
 
