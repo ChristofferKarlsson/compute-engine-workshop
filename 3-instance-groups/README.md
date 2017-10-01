@@ -42,7 +42,6 @@ As you can see, it has pretty much the same options as the instances.
 | Region | Your subnet region |
 | Metadata | startup-script (see below) |
 
-(TODO: Change to wget .sh-script from git)
 ```
 #! /bin/bash
 apt-get update
@@ -193,7 +192,6 @@ Start stress on the machine and watch the graphs and the number of instances in 
 stress --cpu 2 --timeout 60
 ```
 
-(TODO: How to make it create one server at a time? Not 3 immediately.)
 
 #### Clean up
 You will not use this autoscaling policy in later parts of the workshop, so you should remove it.

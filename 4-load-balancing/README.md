@@ -119,7 +119,6 @@ gcloud compute instance-groups managed set-named-ports webservers-managed-2 \
 ### Autoscaling
 You also need to setup new autoscaling rules for your instance groups.
 This time, you will set them up so they scale depending on the load on the load balancer.
-(TODO: More about the load balancing target utilization)
 
 * Setup auto-scaling for both your instance groups with the following properties
 
@@ -158,8 +157,6 @@ The HTTP health check determines the health of the instance by the returned stat
 If wanted, the HTTP health check can be setup on a specific path on the server, such as `/status`.
 This allows you to setup a specific health page that check integrations and whatnot that might be of interest.
 
-(TODO: Write more about how health checks affect instances and traffic?)
-
 The health check command is located under `gcloud compute health-checks`
 
 * Create an HTTP health check with the name `http-basic-check`
@@ -183,8 +180,6 @@ gcloud compute backend-services create webservers-backend-service \
 --health-checks http-basic-check \
 --global
 ```
-(TODO: Global vs. not global?)
-
 
 #### Backends
 With the backend service in place, you can now add [backends](https://cloud.google.com/compute/docs/load-balancing/http/backend-service) to it.
@@ -196,8 +191,6 @@ and is used by the backend service together with the capacity setting, to determ
 There is a sub-command under `gcloud compute backend-services` that is used to add backends.
 
 * Find the command and create two global backends for your instance groups with the following properties
-
-(TODO: Why global?)
 
 | Option | Value |
 |--------|-------|
