@@ -38,7 +38,8 @@ But please notice that the names of the resources might be different from what y
 
 Extra tasks
 
-5. [Secure the SSH access](5-secure-ssh-access)
+5. [Secure the SSH access (using a bastion host)](5-secure-ssh-access)
+5. [Secure the HTTP access (only allow the load balancer access)](6-secure-http-access)
 
 ### Extra
 If you are done early, here are some extra tasks you could do
