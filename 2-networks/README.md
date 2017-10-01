@@ -13,30 +13,46 @@ When enabling the Compute Engine API, a default `auto` mode network is created w
 
 Networks are managed using the `gcloud compute networks` command.
 
-* Find and execute the command to list all networks
 
-Solution
+<p>
+<details>
+<summary><strong>
+Find and execute the command to list all networks
+</strong></summary>
+
 ```
 gcloud compute networks list
 ```
+</details>
+</p>
 
-* List the subnets
+<p>
+<details>
+<summary><strong>
+List the subnets
+</strong></summary>
 
-Solution
 ```
 gcloud compute networks subnets list
 ```
+</details>
+</p>
 
 ### Routes
 The default network is setup with [routes](https://cloud.google.com/compute/docs/vpc/routes) for each subnet, as well as a default route to the internet.
 It is thanks to the routes that the traffic from an instance in one subnet can be routed to another subnet, or to the internet.
 
-* List routes
+<p>
+<details>
+<summary><strong>
+List routes
+</strong></summary>
 
-Solution
 ```
 gcloud compute routes list
 ```
+</details>
+</p>
 
 ### Firewall rules
 [Firewall rules](https://cloud.google.com/compute/docs/vpc/firewalls) are used to control access to instances in the network.
@@ -56,17 +72,30 @@ They are defined by a set of rules:
 
 Firewall rules are managed using the `gcloud compute firewall-rules` command.
 
-* List the firewall rules
+<p>
+<details>
+<summary><strong>
+List the firewall rules
+</strong></summary>
 
-Solution
 ```
 gcloud compute firewall-rules list
 ```
+</details>
+</p>
 
-* Describe the `default-allow-http` firewall rule
-  * Do you see anything familiar here? That we used then setting up machines earlier?
+<p>
+<details>
+<summary><strong>
+Describe the <code>default-allow-http</code> firewall rule
+</strong></summary>
 
-
+```
+gcloud compute firewall-rules describe default-allow-http
+```
+</details>
+Do you see anything familiar here? That we used then setting up machines earlier?
+</p>
 
 ## Setup your own custom network
 To have more control over your network structure and subnets, you can setup a custom network.
@@ -78,13 +107,20 @@ Check out the manual for how to create a network, in which you have to manually 
 gcloud compute networks create --help
 ```
 
-* Create a custom network named `my-network` (hint: you must use a flag for it)
 
-Solution
+<p>
+<details>
+<summary><strong>
+Create a custom network named <code>my-network</code> (hint: you must use a flag for it)
+</strong></summary>
+
 ```
 gcloud compute networks create my-network \
 --mode custom
 ```
+</details>
+</p>
+
 
 
 ### Create subnets
@@ -95,14 +131,12 @@ You will have one subnet where the webservers will be places, and one where your
 Subnets must use one of the [private network address ranges](https://en.wikipedia.org/wiki/Private_network).
 But all subnets does not have to belong to the same range, you can mix as you want (e.g. have a `10.0.1.0/24` subnet and a `192.168.1.0/24` subnet).
 
-* Create two subnets with the following properties:
+<p>
+<details>
+<summary><strong>
+Create two subnets with the following properties:
+</strong></summary>
 
-| Name       | Network    | Region       | Range            |
-|------------|------------|--------------|------------------|
-| webservers | my-network | europe-west3 | 192.168.1.0/24   |
-| management | my-network | europe-west3 | 192.168.100.0/24 |
-
-Solution
 ```
 gcloud compute networks subnets create webservers \
 --network my-network \
@@ -114,6 +148,13 @@ gcloud compute networks subnets create management \
 --region europe-west3 \
 --range 192.168.100.0/24
 ```
+</details>
+</p>
+
+| Name       | Network    | Region       | Range            |
+|------------|------------|--------------|------------------|
+| webservers | my-network | europe-west3 | 192.168.1.0/24   |
+| management | my-network | europe-west3 | 192.168.100.0/24 |
 
 
 ### Create firewall rules
@@ -122,7 +163,21 @@ So, there are no firewall rules for your new network, and since the default rule
 
 To allow traffic to your instances in your new network, you must specify a couple of firewall rules.
 
-* Create a firewall rule that allows for ssh connection to all instances with an `ssh` tag
+<p>
+<details>
+<summary><strong>
+Create a firewall rule that allows SSH to any instance with an <code>ssh</code> tag, using the following properties
+</strong></summary>
+
+```
+gcloud compute firewall-rules create allow-ssh \
+--network my-network \
+--allow tcp:22 \
+--target-tags ssh \
+--source-ranges 0.0.0.0/0
+```
+</details>
+</p>
 
 |Option|Value|Description|
 |------|-----|-----------|
@@ -131,17 +186,22 @@ To allow traffic to your instances in your new network, you must specify a coupl
 |Source| 0.0.0.0/0 | `0.0.0.0/0` means all IP addresses|
 |Tags| ssh| The tags to use on your instances to apply this rule|
 
-Solution
+
+<p>
+<details>
+<summary><strong>
+Create a firewall rule that allows HTTP to any instance with an <code>http</code> tag, using the following properties
+</strong></summary>
+
 ```
-gcloud compute firewall-rules create allow-ssh \
+gcloud compute firewall-rules create allow-http \
 --network my-network \
---allow tcp:22 \
---target-tags ssh \
+--allow tcp:80 \
+--target-tags http \
 --source-ranges 0.0.0.0/0
 ```
-
-
-* Create a firewall rule that allows HTTP to any instance with the `http` tag, using the following properties
+</details>
+</p>
 
 |Option|Value|
 |------|-----|
@@ -150,18 +210,22 @@ gcloud compute firewall-rules create allow-ssh \
 |Source| Anywhere|
 |Tags| http|
 
-Solution
+
+<p>
+<details>
+<summary><strong>
+Create a firewall that allows all internal traffic from the <code>management</code> subnet to any server (no need for tags)
+</strong></summary>
+
 ```
-gcloud compute firewall-rules create allow-http \
+gcloud compute firewall-rules create internal-traffic \
 --network my-network \
---allow tcp:80 \
---target-tags http \
---source-ranges 0.0.0.0/0
+--allow tcp:1-65535,udp:1-65535,icmp \
+--source-ranges 192.168.100.0/24
 ```
-
-* Create a firewall that allows all internal traffic from the `management` subnet to any server (no need for tags)
-
+</details>
 Hints: Specify multiple ports by using `tcp:x-y` and multiple protocols and ports by using `tcp:x-y,udp:i-j`
+</p>
 
 |Option|Value|Description|
 |------|-----|-----------|
@@ -169,38 +233,44 @@ Hints: Specify multiple ports by using `tcp:x-y` and multiple protocols and port
 |Network| my-network||
 |Source| 192.168.100.0/24 |The management subnet IP range|
 
-Solution
-```
-gcloud compute firewall-rules create internal-traffic \
---network my-network \
---allow tcp:1-65535,udp:1-65535,icmp \
---source-ranges 192.168.100.0/24
-```
 
+<p>
+<details>
+<summary><strong>
+List and check the firewall rules
+</strong></summary>
 
-* List and check the firewall rules.
-
-Solution
 ```
 gcloud compute firewall-rules list
 ```
+</details>
+</p>
 
-* Use the filter flag to only show the relevant rules (hint: `--filter "network=<network-name>"`)
+<p>
+<details>
+<summary><strong>
+Use the filter flag to only show the relevant rules (hint: <code>--filter "network=&lt;network-name&gt;"</code>)
+</strong></summary>
 
-Filters can be used on all commands to limit the result list.
-
-Solution
 ```
 gcloud compute firewall-rules list --filter "network=my-network"
 ```
+</details>
+Filters can be used on all commands to limit the result list.
+</p>
+
 
 ### Create an instance
 Now you are done setting up the network, for this time.
 Lets try out if it actually works by creating an instance in your webservers subnet!
 
-* Create an instance in your `webservers` subnet, using your previously created image, and add the `ssh` tag to it
 
-Solution
+<p>
+<details>
+<summary><strong>
+Create an instance in your <code>webservers</code> subnet, using your previously created image, and add the <code>ssh</code> tag to it
+</strong></summary>
+
 ```
 gcloud compute instances create webserver-1 \
 --zone europe-west3-a \
@@ -209,36 +279,73 @@ gcloud compute instances create webserver-1 \
 --tags ssh \
 --image ubuntu-1604-webserver-base
 ```
+</details>
+</p>
 
-* Go to the ip of the instance in the browser. Can you reach it? If not, why?
+<p>
+<details>
+<summary><strong>
+Go to the ip of the instance in the browser. Can you reach it? If not, why?
+</strong></summary>
+</details>
+</p>
 
-* SSH into the instance and try the nginx server there
+<p>
+<details>
+<summary><strong>
+SSH into the instance and try the nginx server there (curl localhost)
+</strong></summary>
+
 ```
 curl localhost
 ```
 
-It seems like the server is running... What could be the problem?
-
-* Identify the problem, fix it and try again on the external IP.
-
-Hint (click to expand): There is a certain tag for reaching the server on the HTTP port missing.
+</details>
+</p>
 
 
-Solution: Add the `http` tag to the server
+
+<p>
+<details>
+<summary><strong>
+It seems like the server is running... What could be the problem? (click to get a hint)
+</strong></summary>
+
+There is a certain tag for reaching the server on the HTTP port missing.
+</details>
+</p>
+
+
+<p>
+<details>
+<summary><strong>
+Identify the problem, fix it and try again on the external IP
+</strong></summary>
+
+Add the `http` tag to the server
 ```
 gcloud compute instances add-tags webserver-1 \
 --tags http \
 --zone europe-west3-a
 ```
+</details>
+</p>
 
 
 ## Clean up
-* Remove the instance you just created
 
-Solution
+<p>
+<details>
+<summary><strong>
+Remove the instance you just created
+</strong></summary>
+
 ```
 gcloud compute instances delete webserver-1 \
 --zone europe-west3-a
 ```
+</details>
+</p>
+
 
 When you are done, you can go to [Part 3 - Instance groups](../3-instance-groups).
