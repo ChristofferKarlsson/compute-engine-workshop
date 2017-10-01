@@ -42,8 +42,15 @@ Extra tasks
 5. [Secure the HTTP access (only allow the load balancer access)](6-secure-http-access)
 
 ### Extra
-If you are done early, here are some extra tasks you could do
+If you are done early, there are some cool stuff that you could look at.
+Here are some suggestions.
 
 * Play around with the [Metadata API](https://cloud.google.com/compute/docs/storing-retrieving-metadata)
+    * Try out the [shut down scripts](https://cloud.google.com/compute/docs/shutdownscript)
+    * Check the loggings of startup/shutdown scripts
+    * [Store the scripts in cloud storage](https://cloud.google.com/compute/docs/startupscript#cloud-storage)
+* Check what is logged in Compute Engine ([Console > Logging](https://console.cloud.google.com/logs))
+* Check out [disk snapshots](https://cloud.google.com/compute/docs/disks/create-snapshots)
+* [Create an extra disk and attach to an instance](https://cloud.google.com/compute/docs/disks/add-persistent-disk)
+* Change your backends to have instances in multiple regions
 * Setup a SQL server and connect the app to it
-* Setup in multiple regions

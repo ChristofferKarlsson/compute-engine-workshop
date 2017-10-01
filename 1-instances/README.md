@@ -195,12 +195,6 @@ service nginx reload
 
 * Wait a few seconds after the machine is created, then open your browser and verify that it runs the same page as before, showing your IP and hostname.
 
-### Extra tasks
-* SSH to the instance and check what the startup-script writes to the logs. Located in `/var/log/daemon.log`.
-* [Shut down scripts](https://cloud.google.com/compute/docs/shutdownscript) - What use can they have? Try setting one up and make sure it is run.
-* [Startup scripts can also be stored in Cloud Storage](https://cloud.google.com/compute/docs/startupscript#cloud-storage)
-
-
 
 ## Images
 In a scenario where you are using some autoscaling mechanism for creating instances, you want the instances to be created fast.
