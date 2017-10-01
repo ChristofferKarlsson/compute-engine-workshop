@@ -14,7 +14,21 @@ The firewall rule should have the load balancer and health checks as source, and
 
 To allow the load balancer and health checks access, you need add their source IP ranges, which can be found in [the documentation](https://cloud.google.com/compute/docs/load-balancing/http/#firewall_rules).
 
-* Create a new firewall rule with the following properties
+<p>
+<details>
+<summary><strong>
+Create a new firewall rule with the following properties
+</strong></summary>
+
+```
+gcloud compute firewall-rules create allow-http-from-load-balancer \
+--network my-network \
+--allow tcp:80 \
+--target-tags http-load-balancer \
+--source-ranges 130.211.0.0/22,35.191.0.0/16
+```
+</details>
+</p>
 
 |Option|Value|
 |------|-----|
@@ -23,21 +37,21 @@ To allow the load balancer and health checks access, you need add their source I
 |Source| `130.211.0.0/22`, `35.191.0.0/16` |
 |Tags| http-load-balancer |
 
-Solution
-```
-gcloud compute firewall-rules create allow-http-from-load-balancer \
---network my-network \
---allow tcp:80 \
---target-tags http-load-balancer \
---source-ranges 130.211.0.0/22,35.191.0.0/16
-```
 
 ### Update the webservers config
 You must now perform the same steps that you did when updating the SSH configuration in [Part 5 - Securing the SSH access](../5-secure-ssh-access).
 Since you have already done this, the solutions are shown below.
 Remember to modify with your values.
 
-* Create a new template for the webservers, using the new `http-load-balancer` tag
+<p>
+<details>
+<summary><strong>
+Create a new template for the webservers, using the new <code>http-load-balancer</code> tag
+</strong></summary>
+
+The answer is already shown below.
+</details>
+</p>
 
 ```
 gcloud compute instance-templates create webserver-template-3 \
@@ -53,10 +67,18 @@ service nginx reload
 "
 ```
 
+<p>
+<details>
+<summary><strong>
+Use a rolling update to update both your instance groups to use the new template
+</strong></summary>
 
-* Use a rolling update to update both your instance groups to use the new template
+The answer is already shown below.
+</details>
 
 (Please note that it takes some time for the load balancer to mark the new servers as healthy and use them.)
+</p>
+
 
 ```
 gcloud beta compute instance-groups managed rolling-action start-update webservers-managed-1 \
@@ -68,10 +90,23 @@ gcloud beta compute instance-groups managed rolling-action start-update webserve
 --zone europe-west3-b
 ```
 
-* Verify that the instances work through your load balancer's IP (this might take some minute)
+<p>
+<details>
+<summary><strong>
+Verify that the instances work through your load balancer's IP (this might take some minute)
+</strong></summary>
 
-* Verify that you can no longer access the instances on their own external IPs
+</details>
+</p>
 
+<p>
+<details>
+<summary><strong>
+Verify that you can no longer access the instances on their own external IPs
+</strong></summary>
+
+</details>
+</p>
 
 
 ## Remove the external IP
@@ -80,17 +115,30 @@ Since you are not using the instances external IPs for anything, you can go ahea
 ### Update template
 There is a flag that can be set on your instances, that prevents it from receiving an external IP address when created.
 
-* Check out the `gcloud compute instance-templates create --help` command and find the flag
+<p>
+<details>
+<summary><strong>
+Check out the <code>gcloud compute instance-templates create --help</code> command and find the flag
+</strong></summary>
 
-Solution
 ```
 --no-address
 ```
+</details>
+</p>
 
 ### Update the webservers config, again
 Once more, create a new webserver template, this time with the new flag.
 
-* Create a new template for the webservers, adding the new flag
+<p>
+<details>
+<summary><strong>
+Create a new template for the webservers, adding the new flag
+</strong></summary>
+
+The answer is already shown below.
+</details>
+</p>
 
 ```
 gcloud compute instance-templates create webserver-template-4 \
@@ -107,10 +155,17 @@ service nginx reload
 "
 ```
 
+<p>
+<details>
+<summary><strong>
+Use a rolling update to update both your instance groups to use the new template
+</strong></summary>
 
-* Use a rolling update to update both your instance groups to use the new template
+The answer is already shown below.
+</details>
 
 (Please note that it takes some time for the load balancer to mark the new servers as healthy and use them.)
+</p>
 
 ```
 gcloud beta compute instance-groups managed rolling-action start-update webservers-managed-1 \
@@ -122,9 +177,22 @@ gcloud beta compute instance-groups managed rolling-action start-update webserve
 --zone europe-west3-b
 ```
 
-* Verify that your new instances does not have any external IP
 
-* Verify that the instances still work through your load balancer IP (this might take some minute)
+<p>
+<details>
+<summary><strong>
+Verify that your new instances does not have any external IP
+</strong></summary>
+</details>
+</p>
+
+<p>
+<details>
+<summary><strong>
+Verify that the instances still work through your load balancer IP (this might take some minute)
+</strong></summary>
+</details>
+</p>
 
 
-You can now go back to the main page and do some extra tasks if you want, or finish the workshop by [clean up after you](../README.md#clean-up).
+You can now go back to the main page and do some [extra tasks](../README.md#extra) if you want, or finish the workshop by [clean up after you](../README.md#clean-up).

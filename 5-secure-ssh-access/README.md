@@ -8,9 +8,12 @@ A better solution would be to deny any external ssh access, and instead add a [b
 In the networks part, you already set up a firewall rule that allows all traffic from your management subnet to anywhere.
 With that rule, any any instance in the management subnet will be able to access your webservers.
 
-* Create a bastion host instance in the management subnet, with the `ssh` tag
+<p>
+<details>
+<summary><strong>
+Create a bastion host instance in the management subnet, with the <code>ssh</code> tag
+</strong></summary>
 
-Solution
 ```
 gcloud compute instances create bastion \
 --zone europe-west3-a \
@@ -18,13 +21,35 @@ gcloud compute instances create bastion \
 --subnet management \
 --tags ssh
 ```
+</details>
+</p>
 
 
 ## Update webservers config
 To update and change the configuration on the webservers, you can not just change the template you created earlier.
 Instead, you must create a new template and update your instance group to use this new template.
 
-* Create a new template for the webservers, with the same properties as before, but without the `ssh` tag
+<p>
+<details>
+<summary><strong>
+Create a new template for the webservers, with the same properties as before, but without the <code>ssh</code> tag
+</strong></summary>
+
+```
+gcloud compute instance-templates create webserver-template-2 \
+--machine-type f1-micro \
+--image ubuntu-1604-webserver-base \
+--tags http \
+--region europe-west3 \
+--subnet webservers \
+--metadata startup-script="#! /bin/bash
+echo 'Hostname: <!--# echo var=\"hostname\" default=\"unknown_host\" --><br/>IP address: <!--# echo var=\"host\" default=\"unknown_host\" -->' > /var/www/html/index.html
+sed -i '/listen \[::\]:80 default_server/a ssi on;' /etc/nginx/sites-available/default
+service nginx reload
+"
+```
+</details>
+</p>
 
 |Option | Value |
 |-------|-------|
@@ -46,20 +71,6 @@ service nginx reload
 ```
 When executing the command, surround the startup-script with a starting and ending `"`.
 
-Solution
-```
-gcloud compute instance-templates create webserver-template-2 \
---machine-type f1-micro \
---image ubuntu-1604-webserver-base \
---tags http \
---region europe-west3 \
---subnet webservers \
---metadata startup-script="#! /bin/bash
-echo 'Hostname: <!--# echo var=\"hostname\" default=\"unknown_host\" --><br/>IP address: <!--# echo var=\"host\" default=\"unknown_host\" -->' > /var/www/html/index.html
-sed -i '/listen \[::\]:80 default_server/a ssi on;' /etc/nginx/sites-available/default
-service nginx reload
-"
-```
 
 To update an instance group to use a new template, there is support for [rolling updates](https://cloud.google.com/compute/docs/instance-groups/updating-managed-instance-groups#starting_a_basic_rolling_update).
 However, this service is only in beta, so you need to access it through `gcloud beta compute instance-groups managed rolling-action start-update`.
@@ -67,9 +78,13 @@ This command will update roll out new machines, using your new template, while d
 
 (Please note that it takes some time for the load balancer to mark the new servers as healthy and use them.)
 
-* Update both your instance groups to use the new template
 
-Solution
+<p>
+<details>
+<summary><strong>
+Update both your instance groups to use the new template
+</strong></summary>
+
 ```
 gcloud beta compute instance-groups managed rolling-action start-update webservers-managed-1 \
 --version template=webserver-template-2 \
@@ -79,10 +94,19 @@ gcloud beta compute instance-groups managed rolling-action start-update webserve
 --version template=webserver-template-2 \
 --zone europe-west3-b
 ```
+</details>
+</p>
 
 
 ## SSH through the bastion host
-* When at least one of the instances are created, try to SSH to it both on the internal and external IP and verify that it does not work
+<p>
+<details>
+<summary><strong>
+When at least one of the instances are created, try to SSH to it both on the internal and external IP and verify that it does not work
+</strong></summary>
+
+</details>
+</p>
 
 To make the commands a bit easier, make your Cloud Shell Compute Engine SSH key the default SSH key (or else, you have to specify it each time you run `ssh`).
 
@@ -91,7 +115,7 @@ Create a `.ssh/config` file in the Cloud Shell and add the following to it
 IdentityFile ~/.ssh/google_compute_engine
 ```
 
-* SSH to one of the webservers, using the bastion as a jump host and the internal IP of the webserver
+SSH to one of the webservers, using the bastion as a jump host and the internal IP of the webserver
 ```
 ssh -o ProxyCommand="ssh -W %h:%p <bastion-external-ip>" <webserver-internal-ip>
 ```
