@@ -79,7 +79,10 @@ gcloud compute instances list
 </p>
 <p>
 <details>
-<summary><strong>Now create an instance similar to the previous one, using the the following properties. (Tip: Use the `gcloud compute instances create --help` to find the flags you need.)</strong></summary>
+<summary><strong>
+Now create an instance similar to the previous one, using the the following properties.
+(Tip: Use the <code>gcloud compute instances create --help</code> to find the flags you need.)
+</strong></summary>
 
 ```
 gcloud compute instances create instance-2 \
