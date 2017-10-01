@@ -134,7 +134,7 @@ But all subnets does not have to belong to the same range, you can mix as you wa
 <p>
 <details>
 <summary><strong>
-Create two subnets with the following properties:
+Create two subnets with the following properties
 </strong></summary>
 
 ```
@@ -224,7 +224,8 @@ gcloud compute firewall-rules create internal-traffic \
 --source-ranges 192.168.100.0/24
 ```
 </details>
-Hints: Specify multiple ports by using `tcp:x-y` and multiple protocols and ports by using `tcp:x-y,udp:i-j`
+
+Hints: Specify multiple ports by using <code>tcp:x-y</code> and multiple protocols and ports by using <code>tcp:x-y,udp:i-j</code>
 </p>
 
 |Option|Value|Description|
