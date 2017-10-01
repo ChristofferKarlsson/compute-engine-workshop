@@ -127,4 +127,4 @@ gcloud beta compute instance-groups managed rolling-action start-update webserve
 * Verify that the instances still work through your load balancer IP (this might take some minute)
 
 
-You can now go back to the main page and do some extra tasks if you want, or finish the workshop by [clean up after you](../#clean-up).
+You can now go back to the main page and do some extra tasks if you want, or finish the workshop by [clean up after you](../README.md#clean-up).

@@ -102,4 +102,4 @@ If you want to know more about this, [you can read about it here](https://en.wik
 
 Want to do another extra part and secure your instances even more? Go to [Part 6 - Secure the HTTP access](../6-secure-http-access).
 
-If not, make sure you remember to [clean up after you are done](../#clean-up).
+If not, make sure you remember to [clean up after you are done](../README.md#clean-up).

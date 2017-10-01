@@ -280,4 +280,4 @@ When it is done setting up, reload the site a couple of times to be sure that th
 When you are done, you are done with the mandatory parts! Well done! :)
 
 There are some extra parts that I encourage you to do, starting with [Part 6 - Securing the SSH access](../6-secure-ssh-access).
-Or if you have something else do to, remember to [clean up after you are done](../#clean-up).
+Or if you have something else do to, remember to [clean up after you are done](../README.md#clean-up).
