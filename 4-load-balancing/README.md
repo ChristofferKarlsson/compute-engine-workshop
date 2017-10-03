@@ -338,7 +338,41 @@ So, now is the time to celebrate with a cup of coffee or tea, or water, or somet
 
 When it is done setting up, reload the site a couple of times to be sure that there are multiple servers that are handling your requests.
 
-## Stress testing/Testing the autoscaler
+## Testing the load balancer
+To try the performance of the load balancer, you will use a tool called `ab` ([a tool from Apache](https://httpd.apache.org/docs/2.4/programs/ab.html)) that is used for HTTP benchmarking.
+
+Install `ab` in the Cloud Shell
+```
+sudo apt-get install apache2-utils -y
+```
+
+Then send a total of 2 000 requests
+```
+ab -n 2000 http://<load-balancer-ip>/
+```
+
+You will see some stats when the command has finished.
+I reached around 100 RPS, which is is way too low to trigger any new instances.
+There are some interesting graphs now that you can check out, though.
+The first one is the backend service details.
+
+* Go to **Console** > **Network services** > **advanced menu** > **Backend services** > **webservers-backend-service**
+
+In this graph, you can see how much traffic it currently is, where it comes from and how it is shared between your two backends.
+Please notice that the graphs are not truly live, there is some delay.
+
+Another graph that might be of interest, is the graphs for the instance groups.
+
+
+### More power
+Keep the Backend services monitoring open and do another test, this time with some more power (20 000 requests, 10 at a time).
+You might need to click the back button and then click on your backend service again to update the graph and numbers.
+```
+ab -n 20000 -c 10 http://<load-balancer-ip>/
+```
+
+Then watch the graph and the numbers.
+This should also trigger the autoscaler to create new instances, as you should be way above the target RPS.
 
 
 When you are done, you are done with the mandatory parts! Well done! :)
